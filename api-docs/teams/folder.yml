@@ -1,0 +1,11 @@
+info:
+  name: teams
+  type: folder
+
+request:
+  auth: inherit
+
+docs:
+  content: |
+    Get information about a team and its roster.
+  type: text/markdown

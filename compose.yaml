@@ -1,0 +1,14 @@
+services:
+  jellyfin:
+    image: docker.io/jellyfin/jellyfin:10.11
+    container_name: jellyfin-dev
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./dev/jellyfin/config:/config
+      - ./dev/jellyfin/cache:/cache
+    environment:
+      - TZ=Europe/Berlin
+    extra_hosts:
+      - "host.containers.internal:host-gateway"
+    restart: unless-stopped

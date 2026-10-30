@@ -1,0 +1,66 @@
+info:
+  name: videos
+  type: http
+  seq: 2
+  tags:
+    - highlander
+
+http:
+  method: GET
+  url: "{{baseUrl}}/videos"
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://api.lolesports.com/api/v2
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: Successful request
+    request:
+      url: "{{baseUrl}}/videos"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "videos": [
+              {
+                "id": 0,
+                "slug": "",
+                "label": "",
+                "locale": "",
+                "reference": "",
+                "source": "",
+                "createdAt": "",
+                "updatedAt": "",
+                "game": ""
+              }
+            ]
+          }
+
+docs: |
+  This endpoint returns details about esports vods on YouTube.
+
+  The data returned by this endpoint is fairly large (more than 5MB) since
+  it includes vods from 2015 up to (at the time of writing this) June 2019
+  and it will continue growing.
+
+  Do consider this when dealing with clients (like mobile phones) where
+  bandwidth and memory may be scarce.
+
+  It is highly advised that you cache the data from this endpoint.

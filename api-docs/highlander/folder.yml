@@ -1,0 +1,11 @@
+info:
+  name: highlander
+  type: folder
+
+request:
+  auth: inherit
+
+docs:
+  content: |
+    These are the old api endpoints.
+  type: text/markdown

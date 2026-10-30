@@ -1,0 +1,33 @@
+opencollection: 1.0.0
+
+info:
+  name: Lolesports API
+  version: "1"
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  auth:
+    type: apikey
+    key: x-api-key
+    value: 0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z
+    placement: header
+
+docs:
+  content: Unofficial documentation to the lolesports API
+  type: text/markdown
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

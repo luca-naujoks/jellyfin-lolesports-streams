@@ -1,0 +1,78 @@
+info:
+  name: getDetails
+  type: http
+  seq: 2
+  tags:
+    - match_details
+
+http:
+  method: GET
+  url: "{{baseUrl}}/details/:gameId"
+  params:
+    - name: startingTime
+      value: ""
+      type: query
+      description: |
+        The date-time (RFC3339)
+      disabled: true
+    - name: participantIds
+      value: ""
+      type: query
+      description: |
+        A list of the participant Ids separated by underscores and not commas
+      disabled: true
+    - name: gameId
+      value: "115548147900684649"
+      type: path
+      description: |
+        The game id of the match
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://feed.lolesports.com/livestats/v1
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: Successful request
+    request:
+      url: "{{baseUrl}}/details/:gameId"
+      method: GET
+      params:
+        - name: gameId
+          value: ""
+          type: path
+          description: |
+            The game id of the match
+        - name: startingTime
+          value: ""
+          type: query
+          description: |
+            The date-time (RFC3339)
+          disabled: true
+        - name: participantIds
+          value: ""
+          type: query
+          description: |
+            A list of the participant Ids separated by underscores and not commas
+          disabled: true
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "frames": []
+          }

@@ -1,0 +1,206 @@
+info:
+  name: getEventDetails
+  type: http
+  seq: 4
+  tags:
+    - events
+
+http:
+  method: GET
+  url: "{{baseUrl}}/getEventDetails?hl=en-US&id=115660540726095029"
+  headers:
+    - name: x-api-key
+      value: "{{apiKey}}"
+      description: |
+        The key is, `0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z`
+  params:
+    - name: hl
+      value: en-US
+      type: query
+    - name: id
+      value: "115660540726095029"
+      type: query
+    - name: hl
+      value: en-GB
+      type: query
+      disabled: true
+    - name: hl
+      value: en-AU
+      type: query
+      disabled: true
+    - name: hl
+      value: cs-CZ
+      type: query
+      disabled: true
+    - name: hl
+      value: de-DE
+      type: query
+      disabled: true
+    - name: hl
+      value: el-GR
+      type: query
+      disabled: true
+    - name: hl
+      value: es-ES
+      type: query
+      disabled: true
+    - name: hl
+      value: es-MX
+      type: query
+      disabled: true
+    - name: hl
+      value: fr-FR
+      type: query
+      disabled: true
+    - name: hl
+      value: hu-HU
+      type: query
+      disabled: true
+    - name: hl
+      value: it-IT
+      type: query
+      disabled: true
+    - name: hl
+      value: pl-PL
+      type: query
+      disabled: true
+    - name: hl
+      value: pt-BR
+      type: query
+      disabled: true
+    - name: hl
+      value: ro-RO
+      type: query
+      disabled: true
+    - name: hl
+      value: ru-RU
+      type: query
+      disabled: true
+    - name: hl
+      value: tr-TR
+      type: query
+      disabled: true
+    - name: hl
+      value: ja-JP
+      type: query
+      disabled: true
+    - name: hl
+      value: ko-KR
+      type: query
+      disabled: true
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://esports-api.lolesports.com/persisted/gw
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: Succesful request
+    request:
+      url: "{{baseUrl}}/getEventDetails"
+      method: GET
+      headers:
+        - name: x-api-key
+          value: "{{apiKey}}"
+          description: |
+            The key is, `0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z`
+      params:
+        - name: hl
+          value: en-US
+          type: query
+        - name: hl
+          value: en-GB
+          type: query
+          disabled: true
+        - name: hl
+          value: en-AU
+          type: query
+          disabled: true
+        - name: hl
+          value: cs-CZ
+          type: query
+          disabled: true
+        - name: hl
+          value: de-DE
+          type: query
+          disabled: true
+        - name: hl
+          value: el-GR
+          type: query
+          disabled: true
+        - name: hl
+          value: es-ES
+          type: query
+          disabled: true
+        - name: hl
+          value: es-MX
+          type: query
+          disabled: true
+        - name: hl
+          value: fr-FR
+          type: query
+          disabled: true
+        - name: hl
+          value: hu-HU
+          type: query
+          disabled: true
+        - name: hl
+          value: it-IT
+          type: query
+          disabled: true
+        - name: hl
+          value: pl-PL
+          type: query
+          disabled: true
+        - name: hl
+          value: pt-BR
+          type: query
+          disabled: true
+        - name: hl
+          value: ro-RO
+          type: query
+          disabled: true
+        - name: hl
+          value: ru-RU
+          type: query
+          disabled: true
+        - name: hl
+          value: tr-TR
+          type: query
+          disabled: true
+        - name: hl
+          value: ja-JP
+          type: query
+          disabled: true
+        - name: hl
+          value: ko-KR
+          type: query
+          disabled: true
+        - name: id
+          value: ""
+          type: query
+          description: |
+            The id of the match that you want
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "data": {
+              "event": ""
+            }
+          }

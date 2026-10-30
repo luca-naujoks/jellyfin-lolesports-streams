@@ -1,0 +1,56 @@
+info:
+  name: navItems
+  type: http
+  seq: 1
+  tags:
+    - highlander
+
+http:
+  method: GET
+  url: "{{baseUrl}}/navItems"
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://api.lolesports.com/api/v1
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: Successful request
+    request:
+      url: "{{baseUrl}}/navItems"
+      method: GET
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "navItems": [
+              {
+                "id": 0,
+                "link": "",
+                "slug": "",
+                "label": "",
+                "imageUrl": "",
+                "order": 0,
+                "external": false,
+                "parentNavItem": "",
+                "createdAt": "",
+                "updatedAt": ""
+              }
+            ],
+            "leagues": []
+          }

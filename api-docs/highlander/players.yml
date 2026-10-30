@@ -1,0 +1,200 @@
+info:
+  name: players
+  type: http
+  seq: 7
+  tags:
+    - highlander
+
+http:
+  method: GET
+  url: "{{baseUrl}}/players"
+  params:
+    - name: slug
+      value: ""
+      type: query
+      description: The player slug.
+    - name: tournament
+      value: ""
+      type: query
+      description: The tournament ID.
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://api.lolesports.com/api/v1
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: Successful request
+    request:
+      url: "{{baseUrl}}/players"
+      method: GET
+      params:
+        - name: slug
+          value: ""
+          type: query
+          description: The player slug.
+        - name: tournament
+          value: ""
+          type: query
+          description: The tournament ID.
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "players": [],
+            "highlanderTournaments": [
+              {
+                "id": "",
+                "title": "",
+                "description": "",
+                "leagueReference": "",
+                "roles": {
+                  "creator": [
+                    {
+                      "origin": "BEARER_TOKEN",
+                      "region": "global",
+                      "summonerName": "test-user",
+                      "summonerLevel": 0,
+                      "profileIconId": 0,
+                      "admin": true
+                    }
+                  ],
+                  "owner": [
+                    {
+                      "origin": "BEARER_TOKEN",
+                      "region": "global",
+                      "summonerName": "test-user",
+                      "summonerLevel": 0,
+                      "profileIconId": 0,
+                      "admin": true
+                    }
+                  ]
+                },
+                "bracketType": {
+                  "identifier": "round_robin",
+                  "options": {
+                    "rounds": ""
+                  }
+                },
+                "matchType": {
+                  "identifier": "bestOf",
+                  "options": {
+                    "best_of": ""
+                  }
+                },
+                "rosteringStrategy": {
+                  "identifier": "passthru"
+                },
+                "seedingStrategy": {
+                  "identifier": "passthru"
+                },
+                "queues": {},
+                "rosters": {},
+                "published": true,
+                "breakpoints": {},
+                "brackets": {},
+                "standings": {
+                  "result": [
+                    [
+                      {
+                        "roster": ""
+                      }
+                    ]
+                  ],
+                  "timestamp": 0,
+                  "source": "manual",
+                  "note": "",
+                  "history": [],
+                  "closed": true
+                },
+                "liveMatches": [],
+                "startDate": "",
+                "endDate": "",
+                "platformIds": [],
+                "gameIds": [],
+                "leagueId": "",
+                "league": ""
+              }
+            ],
+            "scheduleItems": [],
+            "teams": [
+              {
+                "id": 0,
+                "slug": "",
+                "name": "",
+                "guid": "",
+                "teamPhotoUrl": "",
+                "logoUrl": "",
+                "acronym": "",
+                "homeLeague": "",
+                "altLogoUrl": "",
+                "createdAt": "",
+                "updatedAt": "",
+                "bios": {},
+                "foreignIds": {
+                  "drupalId": ""
+                },
+                "players": [],
+                "starters": [],
+                "subs": []
+              }
+            ],
+            "playerStatsSummaries": [
+              {
+                "playerId": "",
+                "kdaRatio": 0,
+                "kdaRatioRank": 0,
+                "csPerTenMinutes": 0,
+                "csPerTenMinutesRank": 0,
+                "killParticipation": 0,
+                "killParticipationRank": 0,
+                "mostplayedchampions": [
+                  {
+                    "championId": 0,
+                    "wins": 0,
+                    "losses": 0,
+                    "total": 0,
+                    "kdaRatio": 0
+                  }
+                ]
+              }
+            ],
+            "playerStatsHistories": [
+              {
+                "id": "",
+                "playerId": "",
+                "championId": 0,
+                "timestamp": 0,
+                "assists": 0,
+                "deaths": 0,
+                "kills": 0,
+                "csPerTenMinutes": 0,
+                "kdaRatio": 0,
+                "killParticipation": 0,
+                "win": true,
+                "match": "",
+                "team": 0,
+                "opponent": 0,
+                "game": ""
+              }
+            ]
+          }
+
+docs: |
+  If the `playerStatsSummaries` and `playerStatsHistories` keys are not present,
+  then the player did not take part in that particular tournament.

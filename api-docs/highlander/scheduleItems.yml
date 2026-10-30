@@ -1,0 +1,190 @@
+info:
+  name: scheduleItems
+  type: http
+  seq: 5
+  tags:
+    - highlander
+
+http:
+  method: GET
+  url: "{{baseUrl}}/scheduleItems"
+  params:
+    - name: leagueId
+      value: ""
+      type: query
+      description: The id of the league you want details of
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://api.lolesports.com/api/v1
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: Successful request
+    request:
+      url: "{{baseUrl}}/scheduleItems"
+      method: GET
+      params:
+        - name: leagueId
+          value: ""
+          type: query
+          description: The id of the league you want details of
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "scheduleItems": [],
+            "highlanderTournaments": [
+              {
+                "id": "",
+                "title": "",
+                "description": "",
+                "leagueReference": "",
+                "roles": {
+                  "creator": [
+                    {
+                      "origin": "BEARER_TOKEN",
+                      "region": "global",
+                      "summonerName": "test-user",
+                      "summonerLevel": 0,
+                      "profileIconId": 0,
+                      "admin": true
+                    }
+                  ],
+                  "owner": [
+                    {
+                      "origin": "BEARER_TOKEN",
+                      "region": "global",
+                      "summonerName": "test-user",
+                      "summonerLevel": 0,
+                      "profileIconId": 0,
+                      "admin": true
+                    }
+                  ]
+                },
+                "bracketType": {
+                  "identifier": "round_robin",
+                  "options": {
+                    "rounds": ""
+                  }
+                },
+                "matchType": {
+                  "identifier": "bestOf",
+                  "options": {
+                    "best_of": ""
+                  }
+                },
+                "rosteringStrategy": {
+                  "identifier": "passthru"
+                },
+                "seedingStrategy": {
+                  "identifier": "passthru"
+                },
+                "queues": {},
+                "rosters": {},
+                "published": true,
+                "breakpoints": {},
+                "brackets": {},
+                "standings": {
+                  "result": [
+                    [
+                      {
+                        "roster": ""
+                      }
+                    ]
+                  ],
+                  "timestamp": 0,
+                  "source": "manual",
+                  "note": "",
+                  "history": [],
+                  "closed": true
+                },
+                "liveMatches": [],
+                "startDate": "",
+                "endDate": "",
+                "platformIds": [],
+                "gameIds": [],
+                "leagueId": "",
+                "league": ""
+              }
+            ],
+            "teams": [
+              {
+                "id": 0,
+                "slug": "",
+                "name": "",
+                "guid": "",
+                "teamPhotoUrl": "",
+                "logoUrl": "",
+                "acronym": "",
+                "homeLeague": "",
+                "altLogoUrl": "",
+                "createdAt": "",
+                "updatedAt": "",
+                "bios": {},
+                "foreignIds": {
+                  "drupalId": ""
+                },
+                "players": [],
+                "starters": [],
+                "subs": []
+              }
+            ],
+            "highlanderRecords": [
+              {
+                "wins": 0,
+                "losses": 0,
+                "ties": 0,
+                "score": 0,
+                "roster": "",
+                "tournament": "",
+                "bracket": "",
+                "id": ""
+              }
+            ],
+            "players": [
+              {
+                "id": 0,
+                "slug": "",
+                "name": "",
+                "firstName": "",
+                "LastName": "",
+                "roleSlug": "",
+                "photoUrl": "",
+                "hometown": "",
+                "region": "",
+                "birthdate": "",
+                "createdAt": "",
+                "updatedAt": "",
+                "bios": {},
+                "foreignIds": "",
+                "socialNetworks": {},
+                "champions": [
+                  {
+                    "id": 0,
+                    "playerId": 0,
+                    "championId": 0,
+                    "championKey": "",
+                    "championName": "",
+                    "createdAt": "",
+                    "updatedAt": ""
+                  }
+                ]
+              }
+            ]
+          }

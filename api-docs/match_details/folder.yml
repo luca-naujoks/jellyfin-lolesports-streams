@@ -1,0 +1,11 @@
+info:
+  name: match_details
+  type: folder
+
+request:
+  auth: inherit
+
+docs:
+  content: |
+    Get the full match details of a game either live or after it has occured.
+  type: text/markdown

@@ -1,0 +1,151 @@
+info:
+  name: highlanderTournaments
+  type: http
+  seq: 3
+  tags:
+    - highlander
+
+http:
+  method: GET
+  url: "{{baseUrl}}/highlanderTournaments"
+  params:
+    - name: league
+      value: ""
+      type: query
+      description: The id of the league you want details of
+  auth: inherit
+
+runtime:
+  variables:
+    - name: baseUrl
+      value: https://api.lolesports.com/api/v2
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: true
+
+examples:
+  - name: 200 Response
+    description: Successful request
+    request:
+      url: "{{baseUrl}}/highlanderTournaments"
+      method: GET
+      params:
+        - name: league
+          value: ""
+          type: query
+          description: The id of the league you want details of
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          [
+            {
+              "id": "",
+              "title": "",
+              "description": "",
+              "leagueReference": "",
+              "roles": {
+                "creator": [
+                  {
+                    "origin": "BEARER_TOKEN",
+                    "region": "global",
+                    "summonerName": "test-user",
+                    "summonerLevel": 0,
+                    "profileIconId": 0,
+                    "admin": true
+                  }
+                ],
+                "owner": [
+                  {
+                    "origin": "BEARER_TOKEN",
+                    "region": "global",
+                    "summonerName": "test-user",
+                    "summonerLevel": 0,
+                    "profileIconId": 0,
+                    "admin": true
+                  }
+                ]
+              },
+              "bracketType": {
+                "identifier": "round_robin",
+                "options": {
+                  "rounds": ""
+                }
+              },
+              "matchType": {
+                "identifier": "bestOf",
+                "options": {
+                  "best_of": ""
+                }
+              },
+              "rosteringStrategy": {
+                "identifier": "passthru"
+              },
+              "seedingStrategy": {
+                "identifier": "passthru"
+              },
+              "queues": {},
+              "rosters": {},
+              "published": true,
+              "breakpoints": {},
+              "brackets": {},
+              "standings": {
+                "result": [
+                  [
+                    {
+                      "roster": ""
+                    }
+                  ]
+                ],
+                "timestamp": 0,
+                "source": "manual",
+                "note": "",
+                "history": [],
+                "closed": true
+              },
+              "liveMatches": [],
+              "startDate": "",
+              "endDate": "",
+              "platformIds": [],
+              "gameIds": [],
+              "leagueId": "",
+              "league": ""
+            }
+          ]
+  - name: 404 Response
+    description: Not Found
+    request:
+      url: "{{baseUrl}}/highlanderTournaments"
+      method: GET
+      params:
+        - name: league
+          value: ""
+          type: query
+          description: The id of the league you want details of
+    response:
+      status: 404
+      statusText: Not Found
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "error": {
+              "statusCode": 404,
+              "message": ""
+            }
+          }
+
+docs: |
+  If a league does not have highlanderTournament objects, the API will return 404

@@ -1,0 +1,11 @@
+info:
+  name: events
+  type: folder
+
+request:
+  auth: inherit
+
+docs:
+  content: |
+    Get information about ongoing, completed or upcoming events.
+  type: text/markdown
