@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"jellyfin-lolesports-streams/internal/api"
 	"jellyfin-lolesports-streams/internal/lolesports"
 	"jellyfin-lolesports-streams/internal/store"
@@ -49,7 +50,7 @@ func main() {
 
 	go func() {
 		err := srv.ListenAndServe()
-		if err != nil && err != http.ErrServerClosed {
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			serverErrors <- err
 		}
 	}()
@@ -84,7 +85,7 @@ func createDummyChannels(channelStore *store.Store) error {
 				Slug:     "worlds",
 				Name:     "Worlds",
 				Region:   "INTERNATIONAL",
-				ImageUrl: "http://static.lolesports.com/leagues/1592594612171_WorldsDarkBG.png",
+				ImageUrl: "https://static.lolesports.com/leagues/1592594612171_WorldsDarkBG.png",
 				Priority: 1,
 			},
 			{
@@ -92,11 +93,11 @@ func createDummyChannels(channelStore *store.Store) error {
 				Slug:     "lck",
 				Name:     "LCK",
 				Region:   "KOREA",
-				ImageUrl: "http://static.lolesports.com/leagues/lck-color-on-black.png",
+				ImageUrl: "https://static.lolesports.com/leagues/lck-color-on-black.png",
 				Priority: 1,
 			},
 		},
-		Language: "DE",
+		Language: "de",
 	})
 	if err != nil {
 		return err
@@ -113,11 +114,11 @@ func createDummyChannels(channelStore *store.Store) error {
 				Slug:     "worlds",
 				Name:     "Worlds",
 				Region:   "INTERNATIONAL",
-				ImageUrl: "http://static.lolesports.com/leagues/1592594612171_WorldsDarkBG.png",
+				ImageUrl: "https://static.lolesports.com/leagues/1592594612171_WorldsDarkBG.png",
 				Priority: 1,
 			},
 		},
-		Language: "EN",
+		Language: "en",
 	})
 	if err != nil {
 		return err

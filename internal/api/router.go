@@ -49,13 +49,15 @@ func NewRouter(handlerConfig *Handler) *http.Server {
 	r.GET("/tv/guide.xml", handler.guideXMLHandler)
 	r.GET("/tv/stream/:channel", handler.getStreamHandler)
 
-	r.GET("/channels", handler.GetChannelsHandler)
-	r.GET("/channels/:id", handler.GetChannelHandler)
-	r.PUT("/channels", handler.UpdateChannelHandler)
-	r.DELETE("/channels/:id", handler.DeleteChannelHandler)
+	r.GET("/api/channels", handler.GetChannelsHandler)
+	r.GET("/api/channels/:id", handler.GetChannelHandler)
+	r.PUT("/api/channels/:id", handler.UpdateChannelHandler)
+	r.DELETE("/api/channels/:id", handler.DeleteChannelHandler)
+
+	r.GET("/api/leagues", handler.getLeagueshandler)
 
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":80",
 		Handler: r.Handler(),
 	}
 

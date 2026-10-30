@@ -147,3 +147,13 @@ func (h *Handler) DeleteChannelHandler(c *gin.Context) {
 	}
 	c.JSON(http.StatusNoContent, gin.H{})
 }
+
+func (h *Handler) getLeagueshandler(c *gin.Context) {
+	leagues, err := h.RiotClient.RequestAllLeagues()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{})
+		return
+	}
+
+	c.JSON(http.StatusOK, leagues)
+}

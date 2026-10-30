@@ -21,12 +21,12 @@ type Team struct {
 }
 
 type Channel struct {
-	ID       string // Required
-	Name     string // Required
-	Provider string
-	Leagues  []League
-	Language string
-	IconUrl  string
+	ID       string   `json:"id"`   // Required
+	Name     string   `json:"name"` // Required
+	Provider string   `json:"provider"`
+	Leagues  []League `json:"leagues"`
+	Language string   `json:"language"`
+	IconUrl  string   `json:"icon_url"`
 }
 
 type League struct {
