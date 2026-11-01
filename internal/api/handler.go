@@ -151,7 +151,7 @@ func (h *Handler) DeleteChannelHandler(c *gin.Context) {
 func (h *Handler) getLeagueshandler(c *gin.Context) {
 	leagues, err := h.RiotClient.RequestAllLeagues()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 

@@ -43,6 +43,8 @@ func NewHandler(handlerConfig *Handler) *Handler {
 func NewRouter(handlerConfig *Handler) *http.Server {
 	r := gin.Default()
 
+	//gin.SetMode(gin.ReleaseMode)
+
 	handler := NewHandler(handlerConfig)
 
 	r.GET("/tv/channels.m3u", handler.m3uHandler)
@@ -51,6 +53,7 @@ func NewRouter(handlerConfig *Handler) *http.Server {
 
 	r.GET("/api/channels", handler.GetChannelsHandler)
 	r.GET("/api/channels/:id", handler.GetChannelHandler)
+	r.POST("/api/channels", handler.CreateChannelHandler)
 	r.PUT("/api/channels/:id", handler.UpdateChannelHandler)
 	r.DELETE("/api/channels/:id", handler.DeleteChannelHandler)
 

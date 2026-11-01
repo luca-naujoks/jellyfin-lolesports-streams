@@ -35,7 +35,6 @@ type League struct {
 	Name     string `json:"name"`
 	Region   string `json:"region"`
 	ImageUrl string `json:"image"`
-	Priority int    `json:"priority"`
 }
 
 type BroadCastChannel struct {
