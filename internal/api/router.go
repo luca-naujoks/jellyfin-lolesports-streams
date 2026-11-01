@@ -1,6 +1,8 @@
 package api
 
 import (
+	"embed"
+	"io/fs"
 	"jellyfin-lolesports-streams/internal/lolesports"
 	"jellyfin-lolesports-streams/internal/store"
 	"jellyfin-lolesports-streams/internal/twitch"
@@ -20,7 +22,7 @@ type RouterConfig struct {
 type Handler struct {
 	RiotClient   *lolesports.Client
 	TwitchClient *twitch.Client
-	ChannelStore *store.Store
+	Store        *store.Store
 	GuideCache   GuideCache
 	Config       RouterConfig
 }
@@ -29,7 +31,7 @@ func NewHandler(handlerConfig *Handler) *Handler {
 	return &Handler{
 		RiotClient:   handlerConfig.RiotClient,
 		TwitchClient: handlerConfig.TwitchClient,
-		ChannelStore: handlerConfig.ChannelStore,
+		Store:        handlerConfig.Store,
 		GuideCache: GuideCache{
 			guide: nil,
 			hash:  [32]byte{},
@@ -40,7 +42,12 @@ func NewHandler(handlerConfig *Handler) *Handler {
 	}
 }
 
-func NewRouter(handlerConfig *Handler) *http.Server {
+func NewRouter(handlerConfig *Handler, assets embed.FS) *http.Server {
+	assetsFS, err := fs.Sub(assets, "assets")
+	if err != nil {
+		panic(err)
+	}
+
 	r := gin.Default()
 
 	//gin.SetMode(gin.ReleaseMode)
@@ -58,6 +65,9 @@ func NewRouter(handlerConfig *Handler) *http.Server {
 	r.DELETE("/api/channels/:id", handler.DeleteChannelHandler)
 
 	r.GET("/api/leagues", handler.getLeagueshandler)
+	r.GET("/image/match/:id", handler.generateImage)
+
+	r.StaticFS("/assets", http.FS(assetsFS))
 
 	srv := &http.Server{
 		Addr:    ":80",

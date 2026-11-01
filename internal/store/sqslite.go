@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"jellyfin-lolesports-streams/internal/types"
 	"os"
 	"path/filepath"
 
@@ -11,7 +12,8 @@ import (
 )
 
 type Store struct {
-	db *sql.DB
+	db     *sql.DB
+	Events []types.Event
 }
 
 func NewSqliteStore() (*Store, error) {

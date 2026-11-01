@@ -1,6 +1,6 @@
 services:
   jellyfin:
-    image: docker.io/jellyfin/jellyfin:10.11
+    image: docker.io/jellyfin/jellyfin:12
     container_name: jellyfin-dev
     ports:
       - "8096:8096"

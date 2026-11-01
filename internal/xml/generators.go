@@ -16,12 +16,12 @@ type xmlProgramm struct {
 	Start   string   `xml:"start,attr"`
 	Stop    string   `xml:"stop,attr,omitempty"`
 
-	Title       string    `xml:"title"`
-	SubTitle    string    `xml:"sub-title"`
-	Description string    `xml:"desc"`
-	Category    string    `xml:"category"`
-	Icon        *xmlIcon  `xml:"icon"`
-	Image       *xmlImage `xml:"image,omitempty"`
+	Title       string     `xml:"title"`
+	SubTitle    string     `xml:"sub-title"`
+	Description string     `xml:"desc"`
+	Category    string     `xml:"category"`
+	Icon        *xmlIcon   `xml:"icon"`
+	Images      []xmlImage `xml:"image,omitempty"`
 }
 type xmlChannel struct {
 	XMLName     xml.Name `xml:"channel"`
@@ -38,7 +38,6 @@ type xmlImage struct {
 	Type   string `xml:"type,attr"`
 	Size   int    `xml:"size,attr,omitempty"`
 	Orient string `xml:"orient,attr,omitempty"`
-	System string `xml:"system"`
 	URL    string `xml:",chardata"`
 }
 type xmlTV struct {
@@ -47,7 +46,7 @@ type xmlTV struct {
 	Programme []xmlProgramm `xml:"programme"`
 }
 
-func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []types.Event) ([]byte, error) {
+func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []types.Event, applicationUrl string) ([]byte, error) {
 	var programme []xmlProgramm
 	var channels []xmlChannel
 
@@ -81,7 +80,20 @@ func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []type
 				Description: fmt.Sprintf("%s vs %s", p.Teams[0].Name, p.Teams[1].Name),
 				Category:    "League of Legends",
 				Icon: &xmlIcon{
-					Src: fmt.Sprintf("https://placehold.co/400x400/AD1010/FFF?text=%s+vs+%s", p.Teams[0].Code, p.Teams[1].Code),
+					Src: fmt.Sprintf("%s/image/match/%s", applicationUrl, p.ID),
+				},
+				Images: []xmlImage{
+					{
+						Type:   "backdrop",
+						Size:   3,
+						Orient: "L",
+						URL:    fmt.Sprintf("%s/assets/594917.jpg", applicationUrl),
+					}, {
+						Type:   "still",
+						Size:   3,
+						Orient: "L",
+						URL:    fmt.Sprintf("%s/image/match/%s", applicationUrl, p.ID),
+					},
 				},
 			}
 			programme = append(programme, program)

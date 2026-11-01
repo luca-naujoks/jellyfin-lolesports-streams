@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"embed"
 	"errors"
 	"fmt"
 	"jellyfin-lolesports-streams/internal/api"
@@ -16,6 +17,9 @@ import (
 	"time"
 )
 
+//go:embed assets
+var assets embed.FS
+
 func main() {
 	config := loadConfiguration()
 
@@ -29,17 +33,16 @@ func main() {
 	SQLStore, err := store.NewSqliteStore()
 	if err != nil {
 		panic(err)
-		return
 	}
 
 	handler := &api.Handler{
 		RiotClient:   riotClient,
 		TwitchClient: twClient,
-		ChannelStore: SQLStore,
+		Store:        SQLStore,
 		Config:       config,
 	}
 
-	srv := api.NewRouter(handler)
+	srv := api.NewRouter(handler, assets)
 
 	go func() {
 		err := srv.ListenAndServe()
@@ -70,7 +73,7 @@ func loadConfiguration() api.RouterConfig {
 	var routerConfig api.RouterConfig
 
 	defaults := api.RouterConfig{
-		ApplicationUrl:   "http://localhost:80/tv/stream/",
+		ApplicationUrl:   "http://localhost:80",
 		TwitchClientId:   "kimne78kx3ncx6brgo4mv6wki5h1ko",
 		DefaultUserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0",
 		CacheTTL:         15 * time.Minute,
