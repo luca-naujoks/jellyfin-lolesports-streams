@@ -1,9 +1,9 @@
 package lolesports
 
 import (
+	"embed"
 	"image"
 	"math"
-	"os"
 
 	"golang.org/x/image/draw"
 	"golang.org/x/image/font"
@@ -31,8 +31,8 @@ func calculateScaledDimensions(originalWidth int, originalHeight int, maxWidth i
 	return int(math.Round(float64(originalWidth) * scale)), int(math.Round(float64(originalHeight) * scale))
 }
 
-func getFontFace(fontPath string) (font.Face, error) {
-	file, err := os.ReadFile(fontPath)
+func getFontFace(fontName string, assets embed.FS) (font.Face, error) {
+	file, err := assets.ReadFile("assets/" + fontName)
 	if err != nil {
 		return nil, err
 	}

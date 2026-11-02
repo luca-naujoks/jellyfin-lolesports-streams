@@ -2,10 +2,12 @@ package lolesports
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	"image/jpeg"
 	"image/png"
 	"io"
 	"jellyfin-lolesports-streams/internal/types"
@@ -16,7 +18,7 @@ import (
 )
 
 // GenerateVsImage Generates the Program Icon
-func GenerateVsImage(teams []types.Team) ([]byte, error) {
+func GenerateVsImage(teams []types.Team, assets embed.FS) ([]byte, error) {
 	var imageBuffer bytes.Buffer
 	var logos []image.Image
 
@@ -42,7 +44,7 @@ func GenerateVsImage(teams []types.Team) ([]byte, error) {
 		logos = append(logos, logo)
 	}
 
-	face, err := getFontFace("./assets/Roboto-BoldItalic.ttf")
+	face, err := getFontFace("Roboto-BoldItalic.ttf", assets)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +62,7 @@ func GenerateVsImage(teams []types.Team) ([]byte, error) {
 	addText(baseImage, "VS", yCenter, face)
 	addText(baseImage, fmt.Sprintf("%s vs %s", teams[0].Code, teams[1].Code), 180, face)
 
-	err = png.Encode(&imageBuffer, baseImage)
+	err = jpeg.Encode(&imageBuffer, baseImage, nil)
 
 	return imageBuffer.Bytes(), err
 }

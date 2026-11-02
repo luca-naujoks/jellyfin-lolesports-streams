@@ -201,10 +201,11 @@ func (h *Handler) generateImage(c *gin.Context) {
 
 	event := h.Store.Events[idx]
 
-	image, err := lolesports.GenerateVsImage(event.Teams)
+	image, err := lolesports.GenerateVsImage(event.Teams, h.Assets)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.Data(http.StatusOK, "image/png", image)
+	c.Data(http.StatusOK, "image/jpeg", image)
 }

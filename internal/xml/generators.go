@@ -77,22 +77,22 @@ func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []type
 				Stop:        p.StartTime.Add(time.Duration(p.BestOf) * time.Hour).Format(xmlTVTimeLayout),
 				Title:       fmt.Sprintf("%s vs %s", p.Teams[0].Code, p.Teams[1].Code),
 				SubTitle:    fmt.Sprintf("%s - %s - Best of %v", p.League, p.Stage, p.BestOf),
-				Description: fmt.Sprintf("%s vs %s", p.Teams[0].Name, p.Teams[1].Name),
+				Description: generateDescription(p),
 				Category:    "League of Legends",
 				Icon: &xmlIcon{
-					Src: fmt.Sprintf("%s/image/match/%s", applicationUrl, p.ID),
+					Src: fmt.Sprintf("%s/api/image/match/%s", applicationUrl, p.ID),
 				},
 				Images: []xmlImage{
 					{
 						Type:   "backdrop",
 						Size:   3,
 						Orient: "L",
-						URL:    fmt.Sprintf("%s/assets/594917.jpg", applicationUrl),
+						URL:    fmt.Sprintf("%s/api/assets/594917.jpg", applicationUrl),
 					}, {
 						Type:   "still",
 						Size:   3,
 						Orient: "L",
-						URL:    fmt.Sprintf("%s/image/match/%s", applicationUrl, p.ID),
+						URL:    fmt.Sprintf("%s/api/image/match/%s", applicationUrl, p.ID),
 					},
 				},
 			}
@@ -126,4 +126,31 @@ func GenerateM3u(channels []types.Channel, baseUrl string) []byte {
 	}
 
 	return []byte(builder.String())
+}
+
+func generateDescription(event types.Event) string {
+	var matchType string
+
+	league := event.League
+	if league == "" {
+		league = "League of Legends"
+	}
+
+	switch event.BestOf {
+	case 1:
+		matchType = "single-game match"
+	case 3:
+		matchType = "Best-of-3 series"
+	case 5:
+		matchType = "Best-of-5 series"
+	}
+
+	return fmt.Sprintf(
+		"Watch %s face off %s at %s - %s in a %s",
+		event.Teams[0].Name,
+		event.Teams[1].Name,
+		event.League,
+		event.Stage,
+		matchType,
+	)
 }

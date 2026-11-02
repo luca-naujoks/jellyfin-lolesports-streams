@@ -20,6 +20,9 @@ import (
 //go:embed assets
 var assets embed.FS
 
+//go:embed web-app/dist/client
+var webInterface embed.FS
+
 func main() {
 	config := loadConfiguration()
 
@@ -40,9 +43,10 @@ func main() {
 		TwitchClient: twClient,
 		Store:        SQLStore,
 		Config:       config,
+		Assets:       assets,
 	}
 
-	srv := api.NewRouter(handler, assets)
+	srv := api.NewRouter(handler, webInterface)
 
 	go func() {
 		err := srv.ListenAndServe()
