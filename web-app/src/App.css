@@ -1,0 +1,50 @@
+body {
+    margin: 0;
+    font-family: system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.app {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: white;
+}
+
+.channels-page {
+    width: 100%;
+    max-width: 66%;
+    margin: 0 auto;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.channels-page__heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.channels-page__heading h2 {
+    margin: 0 0 6px;
+    font-size: 26px;
+}
+
+.channels-page__heading p {
+    margin: 0;
+    color: #a1a1ad;
+}
+
+.channels-grid {
+    display: grid;
+    grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, 270px), 1fr)
+  );
+    gap: 18px;
+    align-items: stretch;
+}
