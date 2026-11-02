@@ -27,10 +27,11 @@ RUN go mod download
 # Copy frontend build files
 COPY --from=frontend /app/dist /app/web-app/dist
 
-
 # Copy GO source files
 COPY *.go .
 COPY internal ./internal
+
+COPY assets ./assets
 
 RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o main .
 
