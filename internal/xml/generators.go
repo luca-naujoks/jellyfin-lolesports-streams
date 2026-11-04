@@ -10,7 +10,7 @@ import (
 
 const xmlTVTimeLayout = "20060102150405 -0700"
 
-type xmlProgramm struct {
+type xmlProgram struct {
 	XMLName xml.Name `xml:"programme"`
 	Channel string   `xml:"channel,attr"`
 	Start   string   `xml:"start,attr"`
@@ -41,13 +41,13 @@ type xmlImage struct {
 	URL    string `xml:",chardata"`
 }
 type xmlTV struct {
-	XMLName   xml.Name      `xml:"tv"`
-	Channel   []xmlChannel  `xml:"channel"`
-	Programme []xmlProgramm `xml:"programme"`
+	XMLName   xml.Name     `xml:"tv"`
+	Channel   []xmlChannel `xml:"channel"`
+	Programme []xmlProgram `xml:"programme"`
 }
 
 func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []types.Event, applicationUrl string) ([]byte, error) {
-	var programme []xmlProgramm
+	var programme []xmlProgram
 	var channels []xmlChannel
 
 	leagueChannels := make(map[string][]string)
@@ -71,7 +71,7 @@ func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []type
 		programChannels := leagueChannels[p.League]
 
 		for _, ch := range programChannels {
-			program := xmlProgramm{
+			program := xmlProgram{
 				Channel:     ch,
 				Start:       p.StartTime.Format(xmlTVTimeLayout),
 				Stop:        p.StartTime.Add(time.Duration(p.BestOf) * time.Hour).Format(xmlTVTimeLayout),

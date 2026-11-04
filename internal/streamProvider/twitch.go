@@ -1,4 +1,4 @@
-package twitch
+package streamProvider
 
 import (
 	"bytes"
@@ -13,52 +13,30 @@ import (
 	"strings"
 )
 
-const (
-	twitchClientID   = "kimne78kx3ncx6brgo4mv6wki5h1ko"
-	defaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0"
-	defaultCodec     = "h264"
-)
-
-type Client struct {
-	http            *http.Client
-	SupportedCodecs []string
+type TwitchClient struct {
+	http   *http.Client
+	config TwitchConfig
 }
 
-type Stream struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
-	Url  string `json:"url"`
+type TwitchConfig struct {
+	TwitchClientId string
+	UserAgent      string
+	Codecs         []string
 }
 
-type target struct {
-	channel string
-}
 type playbackToken struct {
 	Signature string
 	Value     string
 }
 
-func NewClient(client *http.Client) *Client {
+func NewTwitchClient(client *http.Client, config TwitchConfig) *TwitchClient {
 	if client == nil {
 		client = http.DefaultClient
 	}
-	return &Client{http: client}
+	return &TwitchClient{http: client, config: config}
 }
 
-func (c Client) Streams(ctx context.Context, rawURL string) (string, error) {
-	target, err := parseTwitchChannelUrl(rawURL)
-	if err != nil {
-		return "", err
-	}
-	switch true {
-	case target.channel != "":
-		return c.liveStreams(ctx, target.channel)
-	default:
-		return "", errors.New(fmt.Sprintf("target.channel: %s, this shouldn't be empty", target.channel))
-	}
-}
-
-func (c Client) postGraphQL(ctx context.Context, payload map[string]any, out any) error {
+func (c TwitchClient) postGraphQL(ctx context.Context, payload map[string]any, out any) error {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return err
@@ -68,15 +46,20 @@ func (c Client) postGraphQL(ctx context.Context, payload map[string]any, out any
 	if err != nil {
 		return err
 	}
-	req.Header.Set("Client-ID", twitchClientID)
+	req.Header.Set("Client-ID", c.config.TwitchClientId)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", defaultUserAgent)
+	req.Header.Set("User-Agent", c.config.UserAgent)
 
 	res, err := c.http.Do(req)
 	if err != nil {
 		return err
 	}
-	defer res.Body.Close()
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Printf("Error: %s\n", err.Error())
+		}
+	}(res.Body)
 
 	resData, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -89,7 +72,7 @@ func (c Client) postGraphQL(ctx context.Context, payload map[string]any, out any
 	return json.Unmarshal(resData, out)
 }
 
-func (c Client) liveStreams(ctx context.Context, channel string) (string, error) {
+func (c TwitchClient) GetTwitchStreamPlaylist(ctx context.Context, channel string) (string, error) {
 	token, err := c.accessToken(ctx, channel)
 	if err != nil {
 		return "", err
@@ -105,14 +88,11 @@ func (c Client) liveStreams(ctx context.Context, channel string) (string, error)
 	return playlistURL, err
 }
 
-func (c Client) usherUrl(channel string, extra map[string]string) string {
+func (c TwitchClient) usherUrl(channel string, extra map[string]string) string {
 	var codecs string
-	if len(c.SupportedCodecs) > 0 {
-		c.SupportedCodecs = append(c.SupportedCodecs, "h264")
-		codecs = strings.Join(c.SupportedCodecs, ",")
-	} else {
-		codecs = defaultCodec
-	}
+
+	c.config.Codecs = append(c.config.Codecs, "h264")
+	codecs = strings.Join(c.config.Codecs, ",")
 
 	values := url.Values{
 		"platform":                   {"web"},
@@ -136,7 +116,7 @@ func (c Client) usherUrl(channel string, extra map[string]string) string {
 	}).String()
 }
 
-func (c Client) accessToken(ctx context.Context, channel string) (playbackToken, error) {
+func (c TwitchClient) accessToken(ctx context.Context, channel string) (playbackToken, error) {
 	variables := map[string]any{
 		"isLive":     true,
 		"login":      channel,

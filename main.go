@@ -1,19 +1,13 @@
 package main
 
 import (
-	"context"
 	"embed"
-	"errors"
 	"fmt"
 	"jellyfin-lolesports-streams/internal/api"
-	"jellyfin-lolesports-streams/internal/lolesports"
 	"jellyfin-lolesports-streams/internal/store"
-	"jellyfin-lolesports-streams/internal/twitch"
-	"log"
+	"jellyfin-lolesports-streams/internal/types"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 )
 
@@ -24,71 +18,61 @@ var assets embed.FS
 var webInterface embed.FS
 
 func main() {
+	fmt.Println("Loading Configuration from environment variables:")
+	fmt.Println("-------------------------------------------------")
 	config := loadConfiguration()
+	fmt.Println("-------------------------------------------------")
 
 	serverErrors := make(chan error, 1)
 	httpClient := http.DefaultClient
 
-	riotClient := lolesports.NewRiotClient(httpClient)
-	twClient := twitch.NewClient(httpClient)
-	twClient.SupportedCodecs = []string{"h264", "h265", "av1"}
-
+	fmt.Println("Creating New SQliteStore...")
 	SQLStore, err := store.NewSqliteStore()
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("OK\n\n")
 
-	handler := &api.Handler{
-		RiotClient:   riotClient,
-		TwitchClient: twClient,
-		Store:        SQLStore,
-		Config:       config,
-		Assets:       assets,
-	}
+	fmt.Println("Creating New Handler...")
+	handler := api.NewHandler(httpClient, config, SQLStore, assets)
+	fmt.Printf("OK\n\n")
 
+	fmt.Println("Creating New Web Router...")
 	srv := api.NewRouter(handler, webInterface)
+	fmt.Printf("OK\n\n")
 
-	go func() {
-		err := srv.ListenAndServe()
-		if err != nil && !errors.Is(err, http.ErrServerClosed) {
-			serverErrors <- err
-		}
-	}()
+	fmt.Println("Starting Web Server...")
+	go srv.Run(serverErrors)
+	fmt.Printf("OK\n\n")
 
-	shutdownHttpServer(srv)
+	srv.ShutdownHttpServer()
 }
 
-func shutdownHttpServer(srv *http.Server) {
-	quit := make(chan os.Signal, 1)
+func loadConfiguration() types.MainConfig {
+	var config types.MainConfig
 
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("Shutdown Server ...")
+	defaults := types.MainConfig{
+		ApplicationUrl: "http://localhost:80",
+		CacheTTL:       15 * time.Minute,
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Println("Server Shutdown:", err)
-	}
-	log.Println("Server exiting")
-}
-
-func loadConfiguration() api.RouterConfig {
-	var routerConfig api.RouterConfig
-
-	defaults := api.RouterConfig{
-		ApplicationUrl:   "http://localhost:80",
 		TwitchClientId:   "kimne78kx3ncx6brgo4mv6wki5h1ko",
-		DefaultUserAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0",
-		CacheTTL:         15 * time.Minute,
+		TwitchUserAgent:  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:157.0) Gecko/20100101 Firefox/157.0",
+		LolEsportsSecret: "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z",
+		LolEsportsApiUrl: "https://esports-api.lolesports.com/persisted/gw",
 	}
 
-	routerConfig.ApplicationUrl = getEnv("ApplicationUrl", defaults.ApplicationUrl)
-	routerConfig.TwitchClientId = getEnv("TwitchClientId", defaults.TwitchClientId)
-	routerConfig.DefaultUserAgent = getEnv("DefaultUserAgent", defaults.DefaultUserAgent)
-	routerConfig.CacheTTL = defaults.CacheTTL
+	config.DevMode = getEnv("DevMode", "") != ""
 
-	return routerConfig
+	config.ApplicationUrl = getEnv("ApplicationUrl", defaults.ApplicationUrl)
+	config.CacheTTL = defaults.CacheTTL
+
+	config.TwitchClientId = getEnv("TwitchClientId", defaults.TwitchClientId)
+	config.TwitchUserAgent = getEnv("DefaultUserAgent", defaults.TwitchUserAgent)
+
+	config.LolEsportsSecret = getEnv("LolEsportsSecret", defaults.LolEsportsSecret)
+	config.LolEsportsApiUrl = getEnv("LolEsportsApiUrl", defaults.LolEsportsApiUrl)
+
+	return config
 }
 
 func getEnv(envName string, defaultValue string) string {

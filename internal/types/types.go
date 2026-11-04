@@ -37,8 +37,16 @@ type League struct {
 	ImageUrl string `json:"image"`
 }
 
-type BroadCastChannel struct {
-	ID      string
-	Name    string
-	Leagues []string
+type MainConfig struct {
+	DevMode bool
+	// Router Configuration
+	ApplicationUrl string
+	CacheTTL       time.Duration
+
+	// Twitch Configuration
+	TwitchClientId  string
+	TwitchUserAgent string
+
+	LolEsportsSecret string
+	LolEsportsApiUrl string
 }

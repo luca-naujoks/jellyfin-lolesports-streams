@@ -12,27 +12,78 @@ import (
 	"time"
 )
 
-var (
-	baseUrl = "https://esports-api.lolesports.com/persisted/gw"
+type Client struct {
+	http   *http.Client
+	config Config
+}
 
-	apiKeyHeader = "x-api-key"
-	secret       = "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"
-)
+type Config struct {
+	BaseUrl string
+	Secret  string
+}
 
-func NewRiotClient(client *http.Client) *Client {
+type ScheduleResponse struct {
+	Data struct {
+		Schedule struct {
+			Pages struct {
+				Older string `json:"older"`
+				Newer any    `json:"newer"`
+			} `json:"pages"`
+			Events []struct {
+				StartTime time.Time `json:"startTime"`
+				State     string    `json:"state"`
+				Type      string    `json:"type"`
+				BlockName string    `json:"blockName"`
+				League    struct {
+					Name string `json:"name"`
+					Slug string `json:"slug"`
+				} `json:"league"`
+				Match struct {
+					ID    string   `json:"id"`
+					Flags []string `json:"flags"`
+					Teams []struct {
+						Name   string `json:"name"`
+						Code   string `json:"code"`
+						Image  string `json:"image"`
+						Result struct {
+							Outcome  string `json:"outcome"`
+							GameWins int    `json:"gameWins"`
+						} `json:"result"`
+						Record struct {
+							Wins   int `json:"wins"`
+							Losses int `json:"losses"`
+						} `json:"record"`
+					} `json:"teams"`
+					Strategy struct {
+						Type  string `json:"type"`
+						Count int    `json:"count"`
+					} `json:"strategy"`
+				} `json:"match"`
+			} `json:"events"`
+		} `json:"schedule"`
+	} `json:"data"`
+}
+
+func NewRiotClient(client *http.Client, config Config) *Client {
 	if client == nil {
 		client = http.DefaultClient
 	}
-	return &Client{http: client, ctx: context.Background()}
+	return &Client{http: client, config: config}
 }
 
 func (c Client) httpRequest(req *http.Request) ([]byte, error) {
-	req.Header.Set(apiKeyHeader, secret)
+	req.Header.Set("x-api-key", c.config.Secret)
 
 	res, err := c.http.Do(req)
 	if err != nil {
 		return nil, err
 	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			fmt.Printf("Error closing response Body: %s", err.Error())
+		}
+	}(res.Body)
 
 	if res.StatusCode >= 400 {
 		message := fmt.Sprintf("error Code %v received", res.StatusCode)
@@ -49,7 +100,7 @@ func (c Client) httpRequest(req *http.Request) ([]byte, error) {
 
 // RequestAllLeagues Request Leagues eg. LCK Worlds, MSI, LEC...
 func (c Client) RequestAllLeagues() ([]types.League, error) {
-	req, err := http.NewRequestWithContext(c.ctx, http.MethodGet, fmt.Sprintf("%s/getLeagues?hl=en-US", baseUrl), nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, fmt.Sprintf("%s/getLeagues?hl=en-US", c.config.BaseUrl), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +126,7 @@ func (c Client) RequestAllLeagues() ([]types.League, error) {
 
 func (c Client) RequestLeagueSchedule(leagueIds []string) ([]types.Event, error) {
 	ids := strings.Join(leagueIds, ",")
-	req, err := http.NewRequestWithContext(c.ctx, http.MethodGet, fmt.Sprintf("%s/getSchedule?hl=en-US&leagueId=%s", baseUrl, ids), nil)
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, fmt.Sprintf("%s/getSchedule?hl=en-US&leagueId=%s", c.config.BaseUrl, ids), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -92,16 +143,17 @@ func (c Client) RequestLeagueSchedule(leagueIds []string) ([]types.Event, error)
 		return nil, err
 	}
 
-	// Filter Evets that happened before a week
 	var events []types.Event
 
 	for i := range response.Data.Schedule.Events {
-		//if the Event is older than a week ago we ignore it
-		if response.Data.Schedule.Events[i].StartTime.Before(time.Now().AddDate(0, 0, -7)) || response.Data.Schedule.Events[i].Type != "match" {
+		if response.Data.Schedule.Events[i].Type != "match" {
 			continue
 		}
 
-		// Every Event here is in range of a week old or in the future
+		if response.Data.Schedule.Events[i].StartTime.Before(time.Now().AddDate(0, 0, -1)) {
+			continue
+		}
+
 		event := response.Data.Schedule.Events[i]
 
 		eventStruct := types.Event{

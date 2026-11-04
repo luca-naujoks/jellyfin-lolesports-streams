@@ -2,56 +2,93 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"embed"
+	"errors"
 	"io/fs"
 	"jellyfin-lolesports-streams/internal/lolesports"
 	"jellyfin-lolesports-streams/internal/store"
-	"jellyfin-lolesports-streams/internal/twitch"
+	"jellyfin-lolesports-streams/internal/streamProvider"
+	"jellyfin-lolesports-streams/internal/types"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"path"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
+type Server struct {
+	*http.Server
+}
+
 type RouterConfig struct {
-	ApplicationUrl   string
-	TwitchClientId   string
-	DefaultUserAgent string
-	CacheTTL         time.Duration
+	ApplicationUrl string
+	CacheTTL       time.Duration
+	DevMode        bool
 }
 
 type Handler struct {
 	RiotClient   *lolesports.Client
-	TwitchClient *twitch.Client
+	TwitchClient *streamProvider.TwitchClient
 	Store        *store.Store
 	GuideCache   GuideCache
 	Config       RouterConfig
 	Assets       embed.FS
 }
 
-func NewHandler(handlerConfig *Handler) *Handler {
-	return &Handler{
-		RiotClient:   handlerConfig.RiotClient,
-		TwitchClient: handlerConfig.TwitchClient,
-		Store:        handlerConfig.Store,
-		GuideCache: GuideCache{
-			guide: nil,
-			hash:  [32]byte{},
-			// Init the Cache with a definitely outdated cache time
-			createdAt: time.Now().AddDate(0, 0, -1),
-		},
-		Config: handlerConfig.Config,
-		Assets: handlerConfig.Assets,
+func (s *Server) Run(c chan<- error) {
+	err := s.Server.ListenAndServe()
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
+		c <- err
 	}
 }
 
-func NewRouter(handlerConfig *Handler, webInterface embed.FS) *http.Server {
-	r := gin.Default()
-	gin.SetMode(gin.ReleaseMode)
+func (s *Server) ShutdownHttpServer() {
+	quit := make(chan os.Signal, 1)
 
-	handler := NewHandler(handlerConfig)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := s.Server.Shutdown(ctx); err != nil {
+		log.Println("Server Shutdown:", err)
+	}
+	log.Println("Server exiting")
+}
+
+func NewHandler(httpClient *http.Client, config types.MainConfig, sqlStore *store.Store, assets embed.FS) *Handler {
+	return &Handler{
+		RiotClient: lolesports.NewRiotClient(httpClient, lolesports.Config{
+			BaseUrl: config.LolEsportsApiUrl,
+			Secret:  config.LolEsportsSecret,
+		}),
+		TwitchClient: streamProvider.NewTwitchClient(httpClient, streamProvider.TwitchConfig{
+			TwitchClientId: config.TwitchClientId,
+			UserAgent:      config.TwitchUserAgent,
+			Codecs:         []string{"h264", "h265", "av1"},
+		}),
+		Store: sqlStore,
+		Config: RouterConfig{
+			ApplicationUrl: config.ApplicationUrl,
+			CacheTTL:       config.CacheTTL,
+		},
+		Assets: assets,
+	}
+}
+
+func NewRouter(handler *Handler, webInterface embed.FS) *Server {
+	if !handler.Config.DevMode {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
+	r := gin.Default()
 
 	assetsFS, err := fs.Sub(handler.Assets, "assets")
 	if err != nil {
@@ -65,7 +102,7 @@ func NewRouter(handlerConfig *Handler, webInterface embed.FS) *http.Server {
 
 	api := r.Group("/api")
 	{
-		api.GET("/leagues", handler.getLeagueshandler)
+		api.GET("/leagues", handler.getLeaguesHandler)
 
 		api.GET("/channels", handler.GetChannelsHandler)
 		api.GET("/channels/:id", handler.GetChannelHandler)
@@ -87,9 +124,11 @@ func NewRouter(handlerConfig *Handler, webInterface embed.FS) *http.Server {
 
 	registerEmbeddedRoutes(r, webFS)
 
-	srv := &http.Server{
-		Addr:    ":80",
-		Handler: r.Handler(),
+	srv := &Server{
+		Server: &http.Server{
+			Addr:    ":80",
+			Handler: r.Handler(),
+		},
 	}
 
 	return srv

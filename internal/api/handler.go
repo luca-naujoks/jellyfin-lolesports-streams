@@ -39,7 +39,7 @@ func (h *Handler) guideXMLHandler(c *gin.Context) {
 
 	events, err := h.RiotClient.RequestLeagueSchedule(leagueIds)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -47,7 +47,7 @@ func (h *Handler) guideXMLHandler(c *gin.Context) {
 
 	guide, err := xml.GenerateTVGuide(leagueChannels, events, h.Config.ApplicationUrl)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -81,9 +81,7 @@ func (h *Handler) getStreamHandler(c *gin.Context) {
 		return
 	}
 
-	twitchUrl := fmt.Sprintf("https://twitch.tv/%s", channel)
-
-	playlistUrl, err := h.TwitchClient.Streams(context.Background(), twitchUrl)
+	playlistUrl, err := h.TwitchClient.GetTwitchStreamPlaylist(context.Background(), channel)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
@@ -151,7 +149,7 @@ func (h *Handler) DeleteChannelHandler(c *gin.Context) {
 	c.JSON(http.StatusNoContent, gin.H{})
 }
 
-func (h *Handler) getLeagueshandler(c *gin.Context) {
+func (h *Handler) getLeaguesHandler(c *gin.Context) {
 	leagues, err := h.RiotClient.RequestAllLeagues()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())

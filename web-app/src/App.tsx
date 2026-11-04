@@ -108,7 +108,7 @@ export default function App() {
                         <p>Manage your live TV broadcasters</p>
                     </div>
 
-                    <span>{channels().length} channels</span>
+                    <span>{channels()?.length} channels</span>
                 </div>
 
                 <div class="channels-grid">
