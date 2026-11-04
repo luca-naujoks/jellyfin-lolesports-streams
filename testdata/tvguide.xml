@@ -1,0 +1,24 @@
+<tv>
+    <channel id="riotgames">
+        <display-name>Riot Games</display-name>
+        <icon src="https://placeholder.com"></icon>
+    </channel>
+    <programme channel="riotgames" start="00000101151515 +0000" stop="00000101201515 +0000">
+        <title>IG vs TES</title>
+        <sub-title>worlds - Quarterfinals - Best of 5</sub-title>
+        <desc>Watch Invictus Gaming face off TOP ESPORTS at worlds - Quarterfinals in a Best-of-5 series</desc>
+        <category>League of Legends</category>
+        <icon src="https://jellybridge.de/api/image/match/115660540726095109"></icon>
+        <image type="backdrop" size="3" orient="L">https://jellybridge.de/api/assets/594917.jpg</image>
+        <image type="still" size="3" orient="L">https://jellybridge.de/api/image/match/115660540726095109</image>
+    </programme>
+    <programme channel="riotgames" start="00000101151515 +0000" stop="00000101201515 +0000">
+        <title>Gen.G vs LYON</title>
+        <sub-title>worlds - Quarterfinals - Best of 5</sub-title>
+        <desc>Watch Gen.G Esports face off LYON at worlds - Quarterfinals in a Best-of-5 series</desc>
+        <category>League of Legends</category>
+        <icon src="https://jellybridge.de/api/image/match/115660540726095109"></icon>
+        <image type="backdrop" size="3" orient="L">https://jellybridge.de/api/assets/594917.jpg</image>
+        <image type="still" size="3" orient="L">https://jellybridge.de/api/image/match/115660540726095109</image>
+    </programme>
+</tv>

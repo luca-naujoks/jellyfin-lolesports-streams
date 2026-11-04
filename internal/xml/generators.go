@@ -105,7 +105,7 @@ func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []type
 		Channel:   channels,
 	}
 
-	data, err := xml.MarshalIndent(tv, "", "   ")
+	data, err := xml.MarshalIndent(tv, "", "\t")
 	if err != nil {
 		return nil, err
 	}
