@@ -32,7 +32,7 @@ func (h *Handler) guideXMLHandler(c *gin.Context) {
 
 	leagueIds := slices.Sorted(maps.Keys(uniqueLeagueIds))
 
-	if guide, ok := h.GuideCache.Get(leagueChannels, h.Config.CacheTTL); ok {
+	if guide, ok := h.Cache.GetGuideCache(leagueChannels, h.Config.CacheTTL); ok {
 		c.Data(http.StatusOK, "text/xml", guide)
 		return
 	}
@@ -51,7 +51,7 @@ func (h *Handler) guideXMLHandler(c *gin.Context) {
 		return
 	}
 
-	h.GuideCache.Set(guide, leagueChannels)
+	h.Cache.SetGuideCache(guide, leagueChannels)
 	c.Data(http.StatusOK, "text/xml", guide)
 }
 
@@ -198,12 +198,20 @@ func (h *Handler) generateImage(c *gin.Context) {
 	}
 
 	event := h.Store.Events[idx]
+	cacheKey := fmt.Sprintf("%s-%s", event.Teams[0].Code, event.Teams[1].Code)
+
+	if image, ok := h.Cache.GetImageCache(cacheKey); ok {
+		c.Data(http.StatusOK, "image/jpeg", image)
+		return
+	}
 
 	image, err := lolesports.GenerateVsImage(event.Teams, h.Assets)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	h.Cache.SetImageCache(image, cacheKey)
 
 	c.Data(http.StatusOK, "image/jpeg", image)
 }

@@ -16,8 +16,15 @@ type Store struct {
 	Events []types.Event
 }
 
-func NewSqliteStore() (*Store, error) {
-	dsn := "./db/sqlite3.db"
+func NewSqliteStore(devMode bool) (*Store, error) {
+	var dsn string
+
+	switch devMode {
+	case true:
+		dsn = "./dev/bridge/sqlite3.db"
+	case false:
+		dsn = "./db/sqlite3.db"
+	}
 
 	dir := filepath.Dir(dsn)
 	err := os.MkdirAll(dir, 0755)

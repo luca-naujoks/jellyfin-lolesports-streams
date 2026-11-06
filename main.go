@@ -26,24 +26,30 @@ func main() {
 	serverErrors := make(chan error, 1)
 	httpClient := http.DefaultClient
 
-	fmt.Println("Creating New SQliteStore...")
-	SQLStore, err := store.NewSqliteStore()
+	fmt.Print("Creating New SQliteStore...")
+	SQLStore, err := store.NewSqliteStore(config.DevMode)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("OK\n\n")
+	fmt.Print("\r\033[2K")
+	fmt.Printf("Creating New SQliteStore... OK\n")
 
-	fmt.Println("Creating New Handler...")
+	fmt.Print("Creating New Handler...")
 	handler := api.NewHandler(httpClient, config, SQLStore, assets)
-	fmt.Printf("OK\n\n")
+	fmt.Print("\r\033[2K")
+	fmt.Printf("Creating New Handler... OK\n")
 
-	fmt.Println("Creating New Web Router...")
+	fmt.Print("Creating New Web Router...")
 	srv := api.NewRouter(handler, webInterface)
-	fmt.Printf("OK\n\n")
+	fmt.Print("\r\033[2K")
+	fmt.Printf("Creating New Web Router... OK\n")
 
-	fmt.Println("Starting Web Server...")
+	fmt.Print("Starting Web Server...")
 	go srv.Run(serverErrors)
-	fmt.Printf("OK\n\n")
+	fmt.Print("\r\033[2K")
+	fmt.Printf("Starting Web Server... OK\n")
+
+	fmt.Println("Application startup Complete")
 
 	srv.ShutdownHttpServer()
 }
@@ -61,7 +67,7 @@ func loadConfiguration() types.MainConfig {
 		LolEsportsApiUrl: "https://esports-api.lolesports.com/persisted/gw",
 	}
 
-	config.DevMode = getEnv("DevMode", "") != ""
+	config.DevMode = getEnv("DevMode", "false") == "true"
 
 	config.ApplicationUrl = getEnv("ApplicationUrl", defaults.ApplicationUrl)
 	config.CacheTTL = defaults.CacheTTL
@@ -78,10 +84,12 @@ func loadConfiguration() types.MainConfig {
 func getEnv(envName string, defaultValue string) string {
 	envValue := os.Getenv(envName)
 	if envValue == "" {
-		message := fmt.Sprintf("%s Environment Variable is empty. Using Default: %s", envName, defaultValue)
+		message := fmt.Sprintf("%s: %s (Default Value)", envName, defaultValue)
 		fmt.Println(message)
 		return defaultValue
 	}
 
+	message := fmt.Sprintf("%s: %s", envName, envValue)
+	fmt.Println(message)
 	return envValue
 }
