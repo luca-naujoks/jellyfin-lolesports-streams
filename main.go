@@ -18,6 +18,8 @@ var assets embed.FS
 var webInterface embed.FS
 
 func main() {
+	var dsn string
+
 	fmt.Println("Loading Configuration from environment variables:")
 	fmt.Println("-------------------------------------------------")
 	config := loadConfiguration()
@@ -26,8 +28,15 @@ func main() {
 	serverErrors := make(chan error, 1)
 	httpClient := http.DefaultClient
 
+	switch config.DevMode {
+	case true:
+		dsn = "./dev/bridge/sqlite3.db"
+	case false:
+		dsn = "./db/sqlite3.db"
+	}
+
 	fmt.Print("Creating New SQliteStore...")
-	SQLStore, err := store.NewSqliteStore(config.DevMode)
+	SQLStore, err := store.NewSqliteStore(dsn)
 	if err != nil {
 		panic(err)
 	}
