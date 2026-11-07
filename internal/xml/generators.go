@@ -75,7 +75,7 @@ func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []type
 				Channel:     ch,
 				Start:       p.StartTime.Format(xmlTVTimeLayout),
 				Stop:        p.StartTime.Add(time.Duration(p.BestOf) * time.Hour).Format(xmlTVTimeLayout),
-				Title:       fmt.Sprintf("%s vs %s", p.Teams[0].Code, p.Teams[1].Code),
+				Title:       fmt.Sprintf("%s vs %s - %s", p.Teams[0].Code, p.Teams[1].Code, ch),
 				SubTitle:    fmt.Sprintf("%s - %s - Best of %v", p.League, p.Stage, p.BestOf),
 				Description: generateDescription(p),
 				Category:    "League of Legends",
@@ -105,7 +105,7 @@ func GenerateTVGuide(availableChannels []types.Channel, availablePrograms []type
 		Channel:   channels,
 	}
 
-	data, err := xml.MarshalIndent(tv, "", "   ")
+	data, err := xml.MarshalIndent(tv, "", "\t")
 	if err != nil {
 		return nil, err
 	}

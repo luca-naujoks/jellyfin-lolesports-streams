@@ -1,0 +1,31 @@
+# Git
+.git/
+.github/
+
+# IDE
+.idea/
+.vscode/
+
+# Dependencies
+**/node_modules/
+**/dist/
+
+# Development
+testdata/
+dev/
+api-docs/
+tmp/
+*.log
+
+# Go
+vendor/
+coverage.out
+*.test
+
+# Build artifacts
+bin/
+build/
+
+# Local configuration
+.env
+.env.*

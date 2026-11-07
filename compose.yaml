@@ -12,3 +12,14 @@ services:
     extra_hosts:
       - "host.containers.internal:host-gateway"
     restart: unless-stopped
+  jellyBridge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jellybridge:latest
+    container_name: jellyBridge
+    volumes:
+      - ./dev/bridge:/app/db
+    restart: unless-stopped
+    ports:
+      - "9000:80"

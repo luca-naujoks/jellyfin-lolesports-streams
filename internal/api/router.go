@@ -36,7 +36,7 @@ type Handler struct {
 	RiotClient   *lolesports.Client
 	TwitchClient *streamProvider.TwitchClient
 	Store        *store.Store
-	GuideCache   GuideCache
+	Cache        store.Cache
 	Config       RouterConfig
 	Assets       embed.FS
 }

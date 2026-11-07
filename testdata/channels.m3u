@@ -1,0 +1,5 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="riotgames" tvg-logo="https://placeholder.com" group-title="Esports",Riot Games
+https://jellybridge.de/tv/stream/riotgames
+#EXTINF:-1 tvg-id="caedrel" tvg-logo="https://placeholder.com" group-title="Esports",Caedrel
+https://jellybridge.de/tv/stream/caedrel
