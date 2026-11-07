@@ -1,5 +1,5 @@
-
 import "./channelCard.css";
+import {For, Show} from "solid-js";
 
 interface ChannelCardProps {
     channel: Channel;
@@ -7,9 +7,11 @@ interface ChannelCardProps {
 }
 
 export function ChannelCard(props: ChannelCardProps) {
+    const handleEdit = () => props.onEdit(props.channel);
+
     return (
         <article class="channel-card">
-            <div class="channel-card__header">
+            <header class="channel-card__header">
                 <div class="channel-card__avatar">
                     <img
                         src={props.channel.icon_url}
@@ -28,34 +30,40 @@ export function ChannelCard(props: ChannelCardProps) {
                 <span class="channel-card__language">
           {props.channel.language.toUpperCase()}
         </span>
-            </div>
+            </header>
 
             <div class="channel-card__content">
         <span class="channel-card__label">
-          ASSIGNED LEAGUES
+          Assigned leagues
         </span>
 
                 <div class="channel-card__leagues">
-                    {props.channel.leagues.length > 0 ? (
-                        props.channel.leagues.map((league) => (
-                            <span class="channel-card__league">
-                {league.name}
+                    <Show
+                        when={props.channel.leagues?.length}
+                        fallback={
+                            <span class="channel-card__empty">
+                No leagues assigned
               </span>
-                        ))
-                    ) : (
-                        <span class="channel-card__empty">
-              No leagues assigned
-            </span>
-                    )}
+                        }
+                    >
+                        <For each={props.channel.leagues}>
+                            {(league) => (
+                                <span class="channel-card__league">
+                  {league.name}
+                </span>
+                            )}
+                        </For>
+                    </Show>
                 </div>
             </div>
 
             <button
                 type="button"
                 class="channel-card__edit"
-                onClick={() => props.onEdit(props.channel)}
+                onClick={handleEdit}
+                aria-label={`Edit ${props.channel.name}`}
             >
-                <span>✎</span>
+                <span aria-hidden="true">✎</span>
                 Edit channel
             </button>
         </article>
