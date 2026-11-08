@@ -11,7 +11,12 @@ import (
 
 type Cache struct {
 	guideCache guideCache
-	imageCache map[string][]byte
+	imageCache imageCache
+}
+
+type imageCache struct {
+	mu     sync.RWMutex
+	images map[string][]byte
 }
 
 type guideCache struct {
@@ -22,16 +27,27 @@ type guideCache struct {
 }
 
 func (c *Cache) GetImageCache(key string) ([]byte, bool) {
-	cacheEntry := c.imageCache[key]
+	c.imageCache.mu.RLock()
+	defer c.imageCache.mu.RUnlock()
+
+	cacheEntry := c.imageCache.images[key]
 
 	if cacheEntry == nil {
 		return nil, false
 	}
+
 	return cacheEntry, true
 }
 
 func (c *Cache) SetImageCache(image []byte, key string) {
-	c.imageCache[key] = image
+	c.imageCache.mu.Lock()
+	defer c.imageCache.mu.Unlock()
+
+	if c.imageCache.images == nil {
+		c.imageCache.images = make(map[string][]byte)
+	}
+
+	c.imageCache.images[key] = image
 }
 
 func (c *Cache) GetGuideCache(channels []types.Channel, ttl time.Duration) ([]byte, bool) {
@@ -59,13 +75,21 @@ func (c *Cache) GetGuideCache(channels []types.Channel, ttl time.Duration) ([]by
 }
 
 func (c *Cache) SetGuideCache(guide []byte, channels []types.Channel) {
+	c.guideCache.mu.Lock()
+	defer c.guideCache.mu.Unlock()
+
+	if c.guideCache.guide == nil {
+		c.guideCache = guideCache{
+			guide:     nil,
+			hash:      [32]byte{},
+			createdAt: time.Time{},
+		}
+	}
+
 	h, err := hashChannels(channels)
 	if err != nil {
 		return
 	}
-
-	c.guideCache.mu.Lock()
-	defer c.guideCache.mu.Unlock()
 
 	c.guideCache.hash = h
 	c.guideCache.guide = guide
